@@ -1,0 +1,17 @@
+# Ignore all .log files
+*.log
+
+# Ignore all files in the tmp/ directory
+tmp/
+
+# Ignore the build/ directory
+build/
+
+# Ignore a specific file
+secrets.txt
+
+# Ignore all .DS_Store files (common on macOS)
+.DS_Store
+
+# Ignore all node_modules/ directory (common in Node.js projects)
+node_modules/
