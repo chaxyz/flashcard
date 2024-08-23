@@ -46,7 +46,6 @@ public class AuthService {
    public RequestResponse signIn(RequestResponse signIn){
        RequestResponse requestResponse = new RequestResponse();
        try {
-           authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signIn.getEmail(),signIn.getPassword()));
            var user = repository.findByEmail(signIn.getEmail()).orElseThrow();
            System.out.println("USER IS " + user);
            var jwt = jwtUtils.generateToken(user);
