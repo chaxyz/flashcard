@@ -17,10 +17,22 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(name = "username")
+    private String username;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "password")
     private String password;
-    private String role;
+
+    @Column(name = "name")
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private SystemRole role;
 
     @Override
     public boolean isAccountNonExpired() {
@@ -44,11 +56,12 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of(new SimpleGrantedAuthority(role.toString()));
     }
 
-    @Override
-    public String getUsername() {
-        return email;
+    public enum SystemRole{
+        ADMIN,
+        USER
     }
+
 }

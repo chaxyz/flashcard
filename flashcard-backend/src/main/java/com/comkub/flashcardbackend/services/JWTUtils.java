@@ -1,7 +1,8 @@
 package com.comkub.flashcardbackend.services;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.comkub.flashcardbackend.config.CustomProperties;
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -15,13 +16,15 @@ import java.util.function.Function;
 
 @Component
 public class JWTUtils {
+    private final SecretKey Key;
+    private final long EXPIRATION_TIME;
 
-    private SecretKey Key;
-    private  static  final long EXPIRATION_TIME = 86400000 * 7;
-    public JWTUtils(){
-        String secreteString = "843567893696976453275974432697R634976R738467TR678T34865R6834R8763T478378637664538745673865783678548735687R3";
+    @Autowired
+    public JWTUtils(CustomProperties  customProperties){
+        String secreteString = customProperties.getJwtSecret();
         byte[] keyBytes = Base64.getDecoder().decode(secreteString.getBytes(StandardCharsets.UTF_8));
         this.Key = new SecretKeySpec(keyBytes, "HmacSHA256");
+        this.EXPIRATION_TIME = Long.parseLong(customProperties.getJwtLifetime());
     }
 
     public String generateToken(UserDetails userDetails){
@@ -36,9 +39,7 @@ public class JWTUtils {
         return Jwts.builder()
                 .claims(claims)
                 .subject(userDetails.getUsername())
-                //iat
                 .issuedAt(new Date(System.currentTimeMillis()))
-                //exp
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(Key)
                 .compact();
@@ -47,14 +48,36 @@ public class JWTUtils {
     public String extractUsername(String token){
         return extractClaims(token, Claims::getSubject);
     }
-    private <T> T extractClaims(String token, Function<Claims, T> claimsTFunction){
-        return claimsTFunction.apply(Jwts.parser().verifyWith(Key).build().parseSignedClaims(token).getPayload());
+
+    private <T> T extractClaims(String token, Function<Claims, T> claimsFunction){
+        return claimsFunction.apply(Jwts.parser().verifyWith(Key).build().parseSignedClaims(token).getPayload());
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            // Use parserBuilder to set the signing key and parse the token
+            Jwts.parser()
+                    .decryptWith(Key) // Pass the signing key here
+                    .build()
+                    .parseClaimsJws(authToken);  // Parses and validates the token
+            return true;
+        } catch (SecurityException | MalformedJwtException e) {
+            // Handle invalid JWT signature or malformed token
+            logger.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            // Handle expired JWT token
+            logger.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            // Handle unsupported JWT token
+            logger.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            // Handle case where the JWT claims string is empty or null
+            logger.error("JWT claims string is empty: {}", e.getMessage());
+        }
+
+        return false;
     }
+
     public boolean isTokenExpired(String token){
         return extractClaims(token, Claims::getExpiration).before(new Date());
     }

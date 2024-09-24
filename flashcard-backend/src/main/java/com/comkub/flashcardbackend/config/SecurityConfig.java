@@ -1,5 +1,6 @@
 package com.comkub.flashcardbackend.config;
 
+import com.comkub.flashcardbackend.exception.UnauthorizedException;
 import com.comkub.flashcardbackend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,15 +26,17 @@ public class SecurityConfig {
     private UserService service;
     @Autowired
     private JWTAuthFilter jwtAuthFilters;
+    @Autowired
+    private UnauthorizedException unauthorizedException;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/public/**").permitAll()
-                        .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/user/**").hasAnyAuthority("USER")
-                        .requestMatchers("/adminuser/**").hasAnyAuthority("USER", "ADMIN").anyRequest().authenticated())
+        httpSecurity.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(request -> request.requestMatchers(
+                "/login").permitAll().anyRequest().authenticated())
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedException))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthFilters, UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilters, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 
