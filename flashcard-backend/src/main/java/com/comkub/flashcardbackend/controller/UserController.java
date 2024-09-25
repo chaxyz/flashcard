@@ -1,7 +1,7 @@
 package com.comkub.flashcardbackend.controller;
 
-import com.comkub.flashcardbackend.dto.DeckDTO;
 import com.comkub.flashcardbackend.dto.UserDTO;
+import com.comkub.flashcardbackend.entity.User;
 import com.comkub.flashcardbackend.services.JWTUtils;
 import com.comkub.flashcardbackend.services.UserService;
 import org.modelmapper.ModelMapper;
@@ -27,16 +27,9 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getUserDetail(@RequestHeader("Authorization") String token){
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-        String username = jwtUtils.extractUsername(token);
-        UserDetails userDetails = userService.loadUserByUsername(username);
-        if (jwtUtils.isTokenValid(token, userDetails)) {
-           return ResponseEntity.ok(mapper.map(userService.loadUserByUsername(userDetails.getUsername()), UserDTO.class));
-        } else {
-            return ResponseEntity.status(401).body("Invalid Token");
-        }
+        String username = jwtUtils.extractUsername(jwtUtils.getOnlyToken(token));
+        User user = userService.findUserByUsername(username);
+        return ResponseEntity.ok(mapper.map(user, UserDTO.class));
     }
 
 

@@ -1,23 +1,16 @@
 package com.comkub.flashcardbackend.services;
 
-import com.comkub.flashcardbackend.dto.RequestResponse;
 import com.comkub.flashcardbackend.dto.UserDTO;
 import com.comkub.flashcardbackend.dto.jwt.JwtLogin;
 import com.comkub.flashcardbackend.dto.jwt.JwtResponse;
 import com.comkub.flashcardbackend.dto.jwt.JwtSignup;
 import com.comkub.flashcardbackend.entity.User;
-import com.comkub.flashcardbackend.exception.NotFoundException;
-import com.comkub.flashcardbackend.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.HashMap;
 
 @Service
 public class AuthService {

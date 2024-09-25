@@ -1,6 +1,5 @@
 package com.comkub.flashcardbackend.controller;
 
-import com.comkub.flashcardbackend.dto.RequestResponse;
 import com.comkub.flashcardbackend.dto.UserDTO;
 import com.comkub.flashcardbackend.dto.jwt.JwtLogin;
 import com.comkub.flashcardbackend.dto.jwt.JwtResponse;
@@ -9,7 +8,6 @@ import com.comkub.flashcardbackend.services.AuthService;
 import com.comkub.flashcardbackend.services.JWTUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,10 +44,7 @@ public class AuthController {
     }
     @PostMapping("/token")
     public ResponseEntity<JwtResponse> refreshToken(@RequestHeader("Authorization") String token){
-        String onlyToken = null;
-        if (token.startsWith("Bearer ")) {
-            onlyToken = token.substring(7);
-        }
+        String onlyToken = jwtUtils.getOnlyToken(token);
         if (!jwtUtils.validateRefreshToken(onlyToken) || onlyToken == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh-token");
         }

@@ -25,7 +25,7 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    protected User findUserByUsername(String username){
+    public User findUserByUsername(String username){
         return userRepository.findByUsername(username).orElseThrow(() ->new NotFoundException("User not found"));
     }
     protected boolean validateUser(JwtSignup register) {
@@ -37,4 +37,5 @@ public class UserService implements UserDetailsService {
         }
         return true;
     }
+
 }

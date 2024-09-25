@@ -87,4 +87,11 @@ public class JWTUtils {
         return userRepository.existsByUsername(username) && !isTokenExpired(token);
     }
 
+    public String getOnlyToken(String token){
+        if (token.startsWith("Bearer ")) {
+            return token.substring(7);
+        }
+        return null;
+    }
+
 }
