@@ -27,7 +27,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getUserDetail(@RequestHeader("Authorization") String token){
-        String username = jwtUtils.extractUsername(jwtUtils.getOnlyToken(token));
+        String username = jwtUtils.extractUsername(JWTUtils.getOnlyToken(token));
         User user = userService.findUserByUsername(username);
         return ResponseEntity.ok(mapper.map(user, UserDTO.class));
     }

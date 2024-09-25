@@ -44,7 +44,7 @@ public class AuthController {
     }
     @PostMapping("/token")
     public ResponseEntity<JwtResponse> refreshToken(@RequestHeader("Authorization") String token){
-        String onlyToken = jwtUtils.getOnlyToken(token);
+        String onlyToken = JWTUtils.getOnlyToken(token);
         if (!jwtUtils.validateRefreshToken(onlyToken) || onlyToken == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh-token");
         }
