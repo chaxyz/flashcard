@@ -3,6 +3,8 @@ package com.comkub.flashcardbackend.config;
 import com.comkub.flashcardbackend.services.JWTUtils;
 import com.comkub.flashcardbackend.services.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,20 +29,21 @@ public class JWTAuthFilter extends OncePerRequestFilter {
     @Autowired
     private JWTUtils jwtUtils;
     @Autowired
-    private UserService ourUserDetailsService;
+    private UserService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         final String requestTokenHeader = request.getHeader("Authorization");
-        final  String jwtToken;
-        final  String username;
         try {
             String jwt = parseJwt(requestTokenHeader);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUserNameFromJwtToken(jwt);
-
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
+            if (jwt == null || jwt.isBlank()) {
+                System.out.println("yes");
+                chain.doFilter(request, response);
+                return;
+            }
+            String username = jwtUtils.extractUsername(jwt);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtUtils.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,
@@ -49,21 +53,29 @@ public class JWTAuthFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (SecurityException | MalformedJwtException e) {
+            throw new AuthenticationException("Invalid JWT token") {
+            };
+        } catch (ExpiredJwtException e) {
+            throw new AuthenticationException("Expired JWT token") {
+            };
+        } catch (UnsupportedJwtException e) {
+            throw new AuthenticationException("Unsupported JWT token") {
+            };
+        } catch (IllegalArgumentException e) {
+            throw new AuthenticationException("Missing JWT token") {
+            };
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            throw new AuthenticationException("Authentication failure") {
+            };
         }
-
         chain.doFilter(request, response);
     }
+
     private String parseJwt(String request) {
         String token = null;
-        if (request.startsWith("Bearer ")) {
-           token =  request.substring(7);
-            if (token.split("\\.").length != 3) {
-                return token;
-            }else {
-
-            }
+        if (request != null && request.startsWith("Bearer ")) {
+            token = request.substring(7);
         }
         return token;
     }

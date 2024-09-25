@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public class CardService {
-    @Autowired
-    private CardRepository repository;
-
-    public List<Card> getAllCard(){
-        return  repository.findAll();
-    }
-
-}
+//@Service
+//public class CardService {
+//    @Autowired
+//    private CardRepository repository;
+//
+//    public List<Card> getAllCard(){
+//        return  repository.findAll();
+//    }
+//
+//}

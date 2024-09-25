@@ -15,31 +15,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/user")
-public class UserController {
-    @Autowired
-    private JWTUtils jwtUtils ;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ModelMapper mapper;
-
-    @GetMapping("/profile")
-    public ResponseEntity<?> getUserDetail(@RequestHeader("Authorization") String token){
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-        String username = jwtUtils.extractUsername(token);
-        UserDetails userDetails = userService.loadUserByUsername(username);
-        if (jwtUtils.isTokenValid(token, userDetails)) {
-           return ResponseEntity.ok(mapper.map(userService.loadUserByUsername(userDetails.getUsername()), UserDTO.class));
-        } else {
-            return ResponseEntity.status(401).body("Invalid Token");
-        }
-    }
-
-
-}
+//@RestController
+//@RequestMapping("/user")
+//public class UserController {
+//    @Autowired
+//    private JWTUtils jwtUtils ;
+//
+//    @Autowired
+//    private UserService userService;
+//
+//    @Autowired
+//    private ModelMapper mapper;
+//
+//    @GetMapping("/profile")
+//    public ResponseEntity<?> getUserDetail(@RequestHeader("Authorization") String token){
+//        if (token.startsWith("Bearer ")) {
+//            token = token.substring(7);
+//        }
+//        String username = jwtUtils.extractUsername(token);
+//        UserDetails userDetails = userService.loadUserByUsername(username);
+//        if (jwtUtils.isTokenValid(token, userDetails)) {
+//           return ResponseEntity.ok(mapper.map(userService.loadUserByUsername(userDetails.getUsername()), UserDTO.class));
+//        } else {
+//            return ResponseEntity.status(401).body("Invalid Token");
+//        }
+//    }
+//
+//
+//}

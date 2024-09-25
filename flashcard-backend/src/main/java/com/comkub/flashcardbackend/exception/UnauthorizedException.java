@@ -22,11 +22,14 @@ public class UnauthorizedException implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setCharacterEncoding("UTF-8");
 
+        String errorMessage = authException.getMessage();
+
         ErrorResponse errorResponse = new ErrorResponse(
                 Timestamp.from(Instant.now()),
                 HttpStatus.UNAUTHORIZED.value(),
                 HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                "Authentication fail",
+                errorMessage,
+                null,
                 null,
                 null
         );

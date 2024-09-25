@@ -17,6 +17,7 @@ public class ApplicationConfig {
     public ListMapper listMapper() {
         return ListMapper.getInstance();
     }
+
     @Bean
     public CustomProperties customProperties() {
         return new CustomProperties();
