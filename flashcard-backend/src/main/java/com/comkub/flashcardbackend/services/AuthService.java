@@ -21,54 +21,47 @@ import java.util.HashMap;
 
 @Service
 public class AuthService {
-
-    private UserRepository userRepository;
+    private UserService userService;
     private JWTUtils jwtUtils;
     private PasswordEncoder passwordEncoder;
-    private AuthenticationManager authenticationManager;
     private ModelMapper modelMapper;
 
     @Autowired
-    public AuthService(UserRepository userRepository, JWTUtils jwtUtils, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+    public AuthService(JWTUtils jwtUtils, PasswordEncoder passwordEncoder, UserService userService, ModelMapper modelMapper) {
+        this.userService = userService;
         this.jwtUtils = jwtUtils;
-        this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
-        this.modelMapper = new ModelMapper();
+        this.modelMapper = modelMapper;
     }
 
     public UserDTO signUp(JwtSignup register){
-        if(userRepository.existsByUsername(register.getUsername())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already in use");
-        }
-        if(userRepository.existsByEmail(register.getEmail())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already in use");
-        }
         try {
-           User user = new User();
-           user.setUsername(register.getUsername());
-           user.setPassword(passwordEncoder.encode(register.getPassword()));
-           user.setEmail(register.getEmail());
-           user.setRole(User.SystemRole.USER);
-           user.setName(register.getName());
-           User userResult = userRepository.save(user);
-           return modelMapper.map(userResult, UserDTO.class);
-       }catch (Exception e){
+            if(userService.validateUser(register)) {
+                User user = new User();
+                user.setUsername(register.getUsername());
+                user.setPassword(passwordEncoder.encode(register.getPassword()));
+                user.setEmail(register.getEmail());
+                user.setRole(User.SystemRole.USER);
+                user.setName(register.getName());
+                User userResult = userService.addUser(user);
+                return modelMapper.map(userResult, UserDTO.class);
+            }
             throw  new ResponseStatusException(HttpStatus.CONFLICT,"Signup failed");
+       }catch (Exception e){
+            throw  new ResponseStatusException(HttpStatus.CONFLICT,e.getMessage());
        }
     }
 
    public JwtResponse signIn(JwtLogin signIn){
-           User user = userRepository.findByUsername(signIn.getUsername()).orElseThrow(() ->new NotFoundException("User not found"));
+           User user = userService.findUserByUsername(signIn.getUsername());
            String jwt = jwtUtils.generateToken(user);
            String refreshToken = jwtUtils.generateRefreshToken(user);
            return new JwtResponse(jwt, refreshToken);
 
    }
     public  JwtResponse refreshToken(String token){
-        System.out.println(token);
        String username = jwtUtils.extractUsername(token);
-       User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
+        User user = userService.findUserByUsername(username);
        if(jwtUtils.validateRefreshToken(token)){
           String jwt = jwtUtils.generateToken(user);
           return new JwtResponse(jwt);

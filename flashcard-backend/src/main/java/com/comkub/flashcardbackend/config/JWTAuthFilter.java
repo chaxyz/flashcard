@@ -37,7 +37,6 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         try {
             String jwt = parseJwt(requestTokenHeader);
             if (jwt == null || jwt.isBlank()) {
-                System.out.println("yes");
                 chain.doFilter(request, response);
                 return;
             }
