@@ -14,6 +14,11 @@ public class UserDTO {
     private String name;
     private String email;
     private String role;
+
+    public UserDTO(String username, String name) {
+        this.username = username;
+        this.name = name;
+    }
 }
 
 
