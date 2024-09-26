@@ -9,6 +9,4 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface DeckRepository extends JpaRepository<Deck,Integer> {
-    @Query("SELECT d FROM Deck d WHERE d.user = :user")
-    List<Deck> findAllByUser(@Param("user") User user);
 }

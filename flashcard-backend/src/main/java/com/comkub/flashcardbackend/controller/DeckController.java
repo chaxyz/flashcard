@@ -13,9 +13,13 @@ public class DeckController {
     @Autowired
     private DeckService deckService;
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getDecksById(@RequestHeader("Authorization") String token , @PathVariable Integer id) {
-//        String onlyToken = JWTUtils.getOnlyToken(token);
-//
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getDecksById(@RequestHeader("Authorization") String token , @PathVariable Integer id) {
+       return  ResponseEntity.ok(deckService.getDeckDetailById(token,id));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getAllDecOfUser(@RequestHeader("Authorization") String token){
+        return   ResponseEntity.ok(deckService.findAllDeckOfUser(token));
+    }
 }
