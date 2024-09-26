@@ -43,8 +43,9 @@ public class DeckOfUserService {
     }
 
     public  List<Card> getCardInDeck(String token,int deckId){
+        Deck deck = deckService.getDeckById(deckId);
         DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
-        if(deckOfUser != null){
+        if(isPublicAccessibility(deck) || (deckOfUser != null && canAccess(deckOfUser))){
             return cardService.getAllCard(deckId);
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
@@ -68,7 +69,7 @@ public class DeckOfUserService {
 
     public DeckDTO editDeck(DeckDTO deckDTO, String token , int deckId) {
         DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
-        if(deckOfUser != null){
+        if(deckOfUser != null && isOwner(deckOfUser)){
             Deck deck = deckService.updateDeck(deckId, modelMapper.map(deckDTO, Deck.class));
             return modelMapper.map(deck, DeckDTO.class);
         }
@@ -77,7 +78,7 @@ public class DeckOfUserService {
 
     public DeckDTO deleteDeck(String token , int deckId) {
         DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
-        if(deckOfUser != null){
+        if(deckOfUser != null && isOwner(deckOfUser)){
             Deck deck = deckService.deleteDeck(deckId);
             return modelMapper.map(deck, DeckDTO.class);
         }
@@ -85,8 +86,9 @@ public class DeckOfUserService {
     }
 
     public Deck getDeckDetailById(String token ,int deckId){
+        Deck deck = deckService.getDeckById(deckId);
         DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
-        if(deckOfUser != null){
+        if(isPublicAccessibility(deck) || (deckOfUser != null && canAccess(deckOfUser))){
             return  deckService.getDeckById(deckId);
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
@@ -118,5 +120,21 @@ public class DeckOfUserService {
         }
         String username = jwtUtils.extractUsername(token);
         return userRepository.findByUsername(username).orElseThrow(() -> new ItemNotFoundException("User not found"));
+    }
+
+    public boolean isPublicAccessibility(Deck deck) {
+        return deck.isPublic();
+    }
+
+    private boolean canModify(DeckOfUser deckOfUser) {
+        return deckOfUser.getRole().toString().equals("OWNER") || deckOfUser.getRole().toString().equals("EDITOR");
+    }
+
+    private boolean canAccess(DeckOfUser deckOfUser) {
+        return deckOfUser.getRole().toString().equals("OWNER") || deckOfUser.getRole().toString().equals("EDITOR") || deckOfUser.getRole().toString().equals("VISITOR");
+    }
+
+    private boolean isOwner(DeckOfUser deckOfUser) {
+        return deckOfUser.getRole().toString().equals("OWNER");
     }
 }

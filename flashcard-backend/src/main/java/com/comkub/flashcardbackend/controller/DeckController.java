@@ -37,4 +37,9 @@ public class DeckController {
     public ResponseEntity<?> editDeck(@RequestHeader("Authorization") String token, @Valid  @RequestBody DeckDTO deck , @PathVariable Integer id){
         return   ResponseEntity.ok(deckOfUserService.editDeck(deck,token,id));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteDeck(@RequestHeader("Authorization") String token, @PathVariable Integer id){
+        return   ResponseEntity.ok(deckOfUserService.deleteDeck(token,id));
+    }
 }

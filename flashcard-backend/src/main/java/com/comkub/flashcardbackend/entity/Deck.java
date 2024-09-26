@@ -28,5 +28,6 @@ public class Deck {
     @Column(name = "updatedOn", insertable = false , updatable = false)
     private ZonedDateTime updatedOn;
 
+    @Column(name = "isPublic")
     private boolean isPublic;
 }
