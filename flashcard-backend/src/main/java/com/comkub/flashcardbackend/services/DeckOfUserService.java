@@ -85,11 +85,13 @@ public class DeckOfUserService {
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
     }
 
-    public Deck getDeckDetailById(String token ,int deckId){
+    public DeckDTO getDeckDetailById(String token ,int deckId){
         Deck deck = deckService.getDeckById(deckId);
         DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
         if(isPublicAccessibility(deck) || (deckOfUser != null && canAccess(deckOfUser))){
-            return  deckService.getDeckById(deckId);
+            DeckDTO deckDTO = modelMapper.map(deck, DeckDTO.class);
+            deckDTO.setUser(getDeckOfUser(deck).getUser());
+            return  deckDTO;
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
     }
@@ -102,8 +104,7 @@ public class DeckOfUserService {
         return deckOfUserRepository.findDeckOfUserByDeckAndUser(deck,user);
     }
 
-    private DeckOfUser getDeckOfUser(int boardId) {
-        Deck deck = deckService.getDeckById(boardId);
+    private DeckOfUser getDeckOfUser(Deck deck) {
         return deckOfUserRepository.findDeckOfUserByDeckAndUser_Role(deck, DeckOfUser.Role.OWNER);
     }
 
