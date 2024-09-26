@@ -19,7 +19,7 @@ public class DeckController {
     private DeckOfUserService deckOfUserService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Deck> getDecksById(@RequestHeader("Authorization") String token , @PathVariable Integer id) {
+    public ResponseEntity<DeckDTO> getDecksById(@RequestHeader("Authorization") String token , @PathVariable Integer id) {
        return  ResponseEntity.ok(deckOfUserService.getDeckDetailById(token,id));
     }
 
