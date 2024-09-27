@@ -20,7 +20,7 @@ public class DeckOfUser {
 
     @ManyToOne
     @MapsId("deckId")
-    @JoinColumn(name = "boards_id")
+    @JoinColumn(name = "decks_id")
     Deck deck;
 
     @ManyToOne

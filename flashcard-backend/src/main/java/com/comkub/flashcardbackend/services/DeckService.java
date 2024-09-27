@@ -21,9 +21,9 @@ public class DeckService {
 
     protected Deck updateDeck(int deckId, Deck newDeck) {
         Deck deck = getDeckById(deckId);
-        deck.setDeckTitle(newDeck.getDeckTitle());
-        deck.setDeckDescription(newDeck.getDeckDescription());
-        deck.setPublic(newDeck.isPublic());
+        deck.setDeckTitle(newDeck.getDeckTitle() == null ? deck.getDeckTitle() : newDeck.getDeckTitle());
+        deck.setDeckDescription(newDeck.getDeckDescription() == null ? deck.getDeckDescription() : newDeck.getDeckDescription());
+        deck.setPublicVisibility(newDeck.getPublicVisibility() == null ? deck.getPublicVisibility() : newDeck.getPublicVisibility());
         return deckRepository.save(deck);
     }
     protected Deck deleteDeck(int deckId) {

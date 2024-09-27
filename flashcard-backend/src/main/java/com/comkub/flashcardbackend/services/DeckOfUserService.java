@@ -54,7 +54,8 @@ public class DeckOfUserService {
     public DeckDTO createNewDeck(DeckDTO deckDTO, String token) {
         User user = getUserFromToken(token);
         try {
-            Deck deck = deckService.addDeck(modelMapper.map(deckDTO, Deck.class));
+            Deck oldDeck = modelMapper.map(deckDTO, Deck.class);
+            Deck deck = deckService.addDeck(oldDeck);
             if(user != null && deck != null){
                 DeckOfUser deckOfUser = new DeckOfUser( deck,user, DeckOfUser.Role.OWNER);
                 deckOfUserRepository.save(deckOfUser);
@@ -124,7 +125,7 @@ public class DeckOfUserService {
     }
 
     public boolean isPublicAccessibility(Deck deck) {
-        return deck.isPublic();
+        return deck.getPublicVisibility();
     }
 
     private boolean canModify(DeckOfUser deckOfUser) {

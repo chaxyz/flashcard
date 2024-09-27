@@ -1,5 +1,6 @@
 package com.comkub.flashcardbackend.config;
 
+import com.comkub.flashcardbackend.exception.CustomAuthenticationException;
 import com.comkub.flashcardbackend.services.JWTUtils;
 import com.comkub.flashcardbackend.services.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,20 +52,15 @@ public class JWTAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (SecurityException | MalformedJwtException e) {
-            throw new AuthenticationException("Invalid JWT token") {
-            };
+            throw new CustomAuthenticationException("Invalid JWT token");
         } catch (ExpiredJwtException e) {
-            throw new AuthenticationException("Expired JWT token") {
-            };
+            throw new CustomAuthenticationException("Expired JWT token");
         } catch (UnsupportedJwtException e) {
-            throw new AuthenticationException("Unsupported JWT token") {
-            };
+            throw new CustomAuthenticationException("Unsupported JWT token");
         } catch (IllegalArgumentException e) {
-            throw new AuthenticationException("Missing JWT token") {
-            };
+            throw new CustomAuthenticationException("Missing JWT token");
         } catch (Exception e) {
-            throw new AuthenticationException("Authentication failure") {
-            };
+            throw new CustomAuthenticationException("Authentication failure");
         }
         chain.doFilter(request, response);
     }

@@ -13,8 +13,8 @@ public class CardController {
     @Autowired
     private DeckOfUserService deckOfUserService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getDecksById(@RequestHeader("Authorization") String token , @PathVariable Integer id) {
-        return  ResponseEntity.ok(deckOfUserService.getCardInDeck(token,id));
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<?> getDecksById(@RequestHeader("Authorization") String token , @PathVariable Integer id) {
+//        return  ResponseEntity.ok(deckOfUserService.getCardInDeck(token,id));
+//    }
 }

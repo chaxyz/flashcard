@@ -1,6 +1,7 @@
 package com.comkub.flashcardbackend.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
+@Order(2)
 public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex, HttpServletRequest request) {
@@ -50,5 +52,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(Timestamp.from(Instant.now()), ex.getStatusCode().value(), ex.getStatusCode().toString(), ex.getReason(), request.getRequestURI());
         return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
+    }
+
+    @ExceptionHandler(value = { Exception.class })
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        if (ex instanceof AuthenticationException) {
+            // Let the AuthenticationEntryPoint handle this exception
+            throw (AuthenticationException) ex;
+        }
+
+        // Handle other exceptions here
+        ErrorResponse errorResponse = new ErrorResponse(
+                Timestamp.from(Instant.now()),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                ex.getMessage(),
+                null,
+                null,
+                null
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

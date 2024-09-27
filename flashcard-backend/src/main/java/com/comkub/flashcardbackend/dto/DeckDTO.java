@@ -15,7 +15,7 @@ import lombok.Setter;
 public class DeckDTO {
     private String deckTitle;
     private String deckDescription;
-    private boolean isPublic;
+    private Boolean publicVisibility;
     private UserDTO owner;
 
     public void setUser(User user) {
@@ -24,4 +24,5 @@ public class DeckDTO {
         }
         this.owner = new UserDTO(user.getUsername(), user.getName());
     }
+
 }
