@@ -5,7 +5,8 @@ import com.comkub.flashcardbackend.entity.Card;
 import com.comkub.flashcardbackend.entity.Deck;
 import com.comkub.flashcardbackend.entity.DeckOfUser;
 import com.comkub.flashcardbackend.entity.User;
-import com.comkub.flashcardbackend.exception.ItemNotFoundException;
+import com.comkub.flashcardbackend.exception.NotFoundException;
+import com.comkub.flashcardbackend.exception.NotFoundException;
 import com.comkub.flashcardbackend.repository.DeckOfUserRepository;
 import com.comkub.flashcardbackend.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -113,7 +114,7 @@ public class DeckOfUserService {
     private User getUserFromToken(String token) {
         User user = extractUserFromToken(token);
         Integer userId = user.getId();
-        return userRepository.findById(userId).orElseThrow(() -> new ItemNotFoundException("User not found"));
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     private User extractUserFromToken(String token) {
@@ -121,7 +122,7 @@ public class DeckOfUserService {
             token = token.substring(7);
         }
         String username = jwtUtils.extractUsername(token);
-        return userRepository.findByUsername(username).orElseThrow(() -> new ItemNotFoundException("User not found"));
+        return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     public boolean isPublicAccessibility(Deck deck) {

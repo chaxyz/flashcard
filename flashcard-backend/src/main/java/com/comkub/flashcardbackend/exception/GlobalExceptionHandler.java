@@ -51,6 +51,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(Timestamp.from(Instant.now()), HttpStatus.NOT_FOUND.value(),HttpStatus.NOT_FOUND.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+
+
     @ExceptionHandler(value = { Exception.class })
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         if (ex instanceof AuthenticationException) {

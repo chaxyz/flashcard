@@ -1,7 +1,7 @@
 package com.comkub.flashcardbackend.services;
 
 import com.comkub.flashcardbackend.entity.Deck;
-import com.comkub.flashcardbackend.exception.ItemNotFoundException;
+import com.comkub.flashcardbackend.exception.NotFoundException;
 import com.comkub.flashcardbackend.repository.DeckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ public class DeckService {
     private DeckRepository deckRepository;
 
     protected Deck getDeckById(int deckId) {
-        return deckRepository.findById(deckId).orElseThrow(() -> new ItemNotFoundException("Deck id '" + deckId + "' not found"));
+        return deckRepository.findById(deckId).orElseThrow(() -> new NotFoundException("Deck id '" + deckId + "' not found"));
     }
 
     protected  Deck addDeck(Deck deck) {
