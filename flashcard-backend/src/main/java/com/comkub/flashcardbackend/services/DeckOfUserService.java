@@ -1,5 +1,6 @@
 package com.comkub.flashcardbackend.services;
 
+import com.comkub.flashcardbackend.dto.CardDTO;
 import com.comkub.flashcardbackend.dto.DeckDTO;
 import com.comkub.flashcardbackend.entity.Card;
 import com.comkub.flashcardbackend.entity.Deck;
@@ -38,16 +39,55 @@ public class DeckOfUserService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private ListMapper listMapper;
+
     public List<DeckOfUser>findAllDeckOfUser(String token){
         User user = getUserFromToken(token);
         return deckOfUserRepository.findAllByUser(user);
     }
 
-    public  List<Card> getCardInDeck(String token,int deckId){
+    public  List<CardDTO> getCardInDeck(String token,int deckId){
         Deck deck = deckService.getDeckById(deckId);
         DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
         if(isPublicAccessibility(deck) || (deckOfUser != null && canAccess(deckOfUser))){
-            return cardService.getAllCard(deckId);
+            return listMapper.mapList(cardService.getAllCard(deckId),CardDTO.class,modelMapper);
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
+    }
+
+    public  Card getCardInDeckById(String token,int deckId, int cardId){
+        Deck deck = deckService.getDeckById(deckId);
+        DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
+        if(isPublicAccessibility(deck) || (deckOfUser != null && canAccess(deckOfUser))){
+            return cardService.getCardById(cardId);
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
+    }
+
+    public CardDTO creatNewCardInDeck(String token,int deckId, CardDTO cardDTO){
+        Deck deck = deckService.getDeckById(deckId);
+        DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
+        if(deckOfUser != null && canModify(deckOfUser)){
+            Card card = modelMapper.map(cardDTO,Card.class);
+            card.setDeck(deck);
+            return modelMapper.map(cardService.createNewCard(card), CardDTO.class);
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
+    }
+
+    public Card editCard(CardDTO cardDTOO, String token , int deckId , int cardId) {
+        DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
+        if(deckOfUser != null && canModify(deckOfUser)){
+            return cardService.editCard(cardId,cardDTOO);
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
+    }
+
+    public void deleteCard(String token , int deckId , int cardId) {
+        DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
+        if(deckOfUser != null && canModify(deckOfUser)){
+            cardService.deleteCard(cardId);
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
     }
