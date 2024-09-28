@@ -1,6 +1,5 @@
 package com.comkub.flashcardbackend.config;
 
-import com.comkub.flashcardbackend.exception.CustomAuthenticationException;
 import com.comkub.flashcardbackend.services.JWTUtils;
 import com.comkub.flashcardbackend.services.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,9 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -52,15 +49,15 @@ public class JWTAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (SecurityException | MalformedJwtException e) {
-            throw new CustomAuthenticationException("Invalid JWT token");
+            response.setHeader("Error-Message", "Invalid JWT token");
         } catch (ExpiredJwtException e) {
-            throw new CustomAuthenticationException("Expired JWT token");
+            response.setHeader("Error-Message", "Expired JWT token");
         } catch (UnsupportedJwtException e) {
-            throw new CustomAuthenticationException("Unsupported JWT token");
+            response.setHeader("Error-Message", "Unsupported JWT token");
         } catch (IllegalArgumentException e) {
-            throw new CustomAuthenticationException("Missing JWT token");
+            response.setHeader("Error-Message", "Missing JWT token");
         } catch (Exception e) {
-            throw new CustomAuthenticationException("Authentication failure");
+            response.setHeader("Error-Message", "Authentication failure");
         }
         chain.doFilter(request, response);
     }

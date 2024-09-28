@@ -21,13 +21,10 @@ public class UnauthorizedException implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        System.out.println("yes");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setCharacterEncoding("UTF-8");
-
-        String errorMessage = authException.getMessage();
-        System.out.println(errorMessage);
+        String errorMessage = response.getHeader("Error-Message");
 
         ErrorResponse errorResponse = new ErrorResponse(
                 Timestamp.from(Instant.now()),
@@ -38,7 +35,6 @@ public class UnauthorizedException implements AuthenticationEntryPoint {
                 null,
                 null
         );
-        System.out.println(errorResponse);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(response.getWriter(), errorResponse);
     }

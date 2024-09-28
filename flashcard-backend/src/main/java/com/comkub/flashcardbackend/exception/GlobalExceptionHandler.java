@@ -1,7 +1,6 @@
 package com.comkub.flashcardbackend.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -13,12 +12,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-@Order(2)
 public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex, HttpServletRequest request) {
@@ -57,7 +54,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = { Exception.class })
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         if (ex instanceof AuthenticationException) {
-            // Let the AuthenticationEntryPoint handle this exception
             throw (AuthenticationException) ex;
         }
 
