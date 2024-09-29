@@ -1,16 +1,20 @@
 package com.comkub.flashcardbackend.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Data
 @Entity
 @Table(name = "decks")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Deck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,7 +1,6 @@
 package com.comkub.flashcardbackend.controller;
 
 import com.comkub.flashcardbackend.dto.DeckDTO;
-import com.comkub.flashcardbackend.entity.Deck;
 import com.comkub.flashcardbackend.entity.DeckOfUser;
 import com.comkub.flashcardbackend.services.DeckOfUserService;
 import jakarta.validation.Valid;
