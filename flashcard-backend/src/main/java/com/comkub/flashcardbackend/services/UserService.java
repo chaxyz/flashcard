@@ -14,21 +14,26 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService implements UserDetailsService {
-    @Autowired
+
     private UserRepository userRepository;
+
+    public UserService(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User not found"));
     }
 
-    protected User addUser(User user) {
+    public User addUser(User user) {
         return userRepository.save(user);
     }
 
     public User findUserByUsername(String username){
         return userRepository.findByUsername(username).orElseThrow(() ->new NotFoundException("User not found"));
     }
-    protected boolean validateUser(JwtSignup register) {
+    public boolean validateUser(JwtSignup register) {
         if(userRepository.existsByUsername(register.getUsername())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already in use");
         }
