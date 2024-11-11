@@ -15,9 +15,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -35,6 +32,7 @@ public class UserServiceTests {
     public void setup(){
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user = User.builder()
+                .id(1)
                 .username("exampleUser1")
                 .name("John Doe")
                 .email("sam@gmail.com")

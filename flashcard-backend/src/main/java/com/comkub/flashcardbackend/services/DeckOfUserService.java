@@ -14,8 +14,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -42,6 +44,7 @@ public class DeckOfUserService {
     @Autowired
     private ListMapper listMapper;
 
+
     public List<DeckOfUser>findAllDeckOfUser(String token){
         User user = getUserFromToken(token);
         return deckOfUserRepository.findAllByUser(user);
@@ -54,6 +57,19 @@ public class DeckOfUserService {
             return listMapper.mapList(cardService.getAllCard(deckId),CardDTO.class,modelMapper);
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not a deck owner");
+    }
+
+    public  void  addCardByfile(MultipartFile file, String token, int deckId){
+        DeckOfUser deckOfUser = validateUserAndBoard(token,deckId);
+        Deck deck = deckService.getDeckById(deckId);
+        try {
+            if(isOwner(deckOfUser)){
+                cardService.processFile(file,deck);
+            }
+        }catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
     }
 
     public  Card getCardInDeckById(String token,int deckId, int cardId){
